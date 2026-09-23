@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce CRM Analytics License & Permission Architect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            salesforce: {
+              blue: '#0176D3',
+              darkBlue: '#014486',
+              lightBlue: '#EAF5FE',
+              cloud: '#F3F3F3',
+              border: '#DDDBDA',
+              textDark: '#181818',
+              slate: '#706E6B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.7); }
+    code { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-sky-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-lg font-bold text-slate-900 tracking-tight leading-none">CRMA License & Permission Architect</h1>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 uppercase tracking-wide">Salesforce CRMA</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">PSL, Permission Set & App Sharing Recommendation Engine</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs text-slate-600">
+          <button id="header-reset-btn" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Clear / Start Fresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Natural Language Input & Controls Bar -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 transition-all">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+        <div>
+          <label for="scenario-input" class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span>Natural Language Requirement Analyzer</span>
+            <span class="text-xs font-normal text-slate-500">Type what your user can and cannot do</span>
+          </label>
+        </div>
+        <div id="smart-matched-badge" class="hidden items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span id="matched-persona-name">Scenario Parsed</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-stretch gap-2.5">
+        <div class="relative flex-1">
+          <input 
+            id="scenario-input" 
+            type="text" 
+            placeholder="e.g. A person can only view dashboard but cannot edit any, or user builds recipes and exports CSV..."
+            class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-sm transition"
+          />
+          <div class="absolute left-3.5 top-3.5 text-slate-400 pointer-events-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <button id="clear-input-btn" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 rounded-md transition hidden" title="Clear text">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <button 
+          id="analyze-btn" 
+          class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span>Analyze Requirement</span>
+        </button>
+
+        <button 
+          id="clear-all-btn" 
+          class="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm border border-slate-200 transition flex items-center justify-center gap-1.5 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span>Clear</span>
+        </button>
+      </div>
+
+      <!-- Quick Persona Presets -->
+      <div class="mt-4 pt-3 border-t border-slate-100">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Or Load Persona Template:</span>
+          <span class="text-[11px] text-slate-400">Clicking loads template without pre-locking</span>
+        </div>
+        <div class="flex flex-wrap gap-2" id="preset-buttons-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: Granular Capabilities Toggle Checklist -->
+      <div class="lg:col-span-5 space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div>
+              <h2 class="text-sm font-bold text-slate-900">Fine-Tune Capabilities</h2>
+              <p class="text-xs text-slate-500">Select exact permissions required by the user</p>
+            </div>
+            <span id="active-caps-count" class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-600 border border-slate-200">0 selected</span>
+          </div>
+
+          <div class="space-y-2.5" id="capabilities-list">
+            <!-- Populated dynamically via JS with custom checkboxes -->
+          </div>
+        </div>
+
+        <!-- Architecture Rules & Order of Operations Alert -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 text-xs space-y-2 text-amber-900">
+          <div class="flex items-center gap-1.5 font-bold text-amber-800">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span>Core Salesforce Rule Check</span>
+          </div>
+          <p id="rule-callout-text" class="text-slate-700 leading-relaxed">
+            <strong>Order of Operations:</strong> A Permission Set License (PSL) must be assigned to the User record <em>before</em> any dependent Permission Set can be assigned.
+          </p>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Output Recommendation Engine -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Empty State Prompt (Visible when 0 permissions selected) -->
+        <div id="empty-state-panel" class="bg-white rounded-2xl border-2 border-dashed border-slate-300 p-10 text-center space-y-3">
+          <div class="w-12 h-12 mx-auto rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-slate-800">No Permissions Selected Yet</h3>
+          <p class="text-xs text-slate-500 max-w-md mx-auto">
+            Type your user's requirements above (e.g. <em>"a person can only view dashboard but cannot edit any"</em>) and click <strong>Analyze Requirement</strong>, or check specific capabilities on the left to generate the recommended PSL, Permission Set, and setup path.
+          </p>
+          <div class="pt-2 flex flex-wrap justify-center gap-2">
+            <button onclick="applyPersonaPreset('View-Only Consumer')" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">Try "View-Only Consumer"</button>
+            <button onclick="applyPersonaPreset('Dashboard Designer')" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition">Try "Dashboard Designer"</button>
+          </div>
+        </div>
+
+        <!-- Populated Results Panel (Hidden by default when 0 selected) -->
+        <div id="results-panel" class="space-y-6 hidden">
+
+          <!-- Result Overview Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- PSL Card -->
+            <div class="bg-white p-4 rounded-xl border-2 border-blue-600 shadow-sm relative overflow-hidden flex flex-col justify-between">
+              <div class="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full pointer-events-none -mr-4 -mt-4"></div>
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700">1. Required PSL</span>
+                <h3 id="card-psl-name" class="text-base font-extrabold text-slate-900 mt-1 leading-snug">--</h3>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span id="card-psl-type">--</span>
+                <span id="card-psl-badge" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-semibold rounded text-[10px]">Standard</span>
+              </div>
+            </div>
+
+            <!-- Permission Set Card -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700">2. Recommended PS</span>
+                <h3 id="card-ps-name" class="text-base font-extrabold text-slate-900 mt-1 leading-snug">--</h3>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>Type:</span>
+                <span id="card-ps-type-badge" class="font-semibold text-slate-700">Custom PS</span>
+              </div>
+            </div>
+
+            <!-- App Sharing Role Card -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700">3. App Folder Role</span>
+                <h3 id="card-app-role" class="text-base font-extrabold text-slate-900 mt-1 leading-snug">--</h3>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>In App Share:</span>
+                <span id="card-app-role-desc" class="font-semibold text-emerald-600">Read-Only</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail Tabs Section -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-slate-200 bg-slate-50/70 text-xs font-semibold px-4 pt-2 gap-2 overflow-x-auto">
+              <button class="tab-btn px-4 py-2.5 border-b-2 border-blue-600 text-blue-600 transition flex items-center gap-1.5" data-tab="guide">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                Step-by-Step Setup Guide
+              </button>
+              <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition flex items-center gap-1.5" data-tab="matrix">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                System Permission Details
+              </button>
+              <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition flex items-center gap-1.5" data-tab="code">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                SOQL & Apex Scripts
+              </button>
+              <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition flex items-center gap-1.5" data-tab="gotchas">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Architect Gotchas
+              </button>
+            </div>
+
+            <!-- Tab 1: Step-by-Step Guide -->
+            <div id="tab-content-guide" class="p-6 space-y-6">
+              <div id="guide-narrative" class="text-sm text-slate-700 bg-blue-50/60 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
+                <div class="p-2 bg-blue-600 text-white rounded-lg shrink-0 mt-0.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div id="narrative-text" class="leading-relaxed">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- Ordered Setup Steps Timeline -->
+              <div class="space-y-4" id="steps-timeline">
+                <!-- Dynamically populated steps -->
+              </div>
+            </div>
+
+            <!-- Tab 2: Specific Permissions Required -->
+            <div id="tab-content-matrix" class="p-6 hidden">
+              <h4 class="text-sm font-bold text-slate-900 mb-3">System Permissions Required for this Configuration</h4>
+              <div class="border border-slate-200 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                    <tr>
+                      <th class="p-3">System Permission API / Label</th>
+                      <th class="p-3">Status</th>
+                      <th class="p-3">Impact & Scope</th>
+                    </tr>
+                  </thead>
+                  <tbody id="permissions-table-body" class="divide-y divide-slate-100">
+                    <!-- Injected via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Tab 3: SOQL & Apex Code -->
+            <div id="tab-content-code" class="p-6 hidden space-y-5">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-800">Audit License Assignment via SOQL</label>
+                  <button class="copy-btn text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1" data-target="soql-code">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    Copy SOQL
+                  </button>
+                </div>
+                <pre class="bg-slate-900 text-slate-100 p-3.5 rounded-xl text-xs overflow-x-auto border border-slate-800"><code id="soql-code">// Query users with CRM Analytics PSL
+SELECT AssigneeId, Assignee.Name, Assignee.Email, 
+       PermissionSetLicense.MasterLabel 
+FROM PermissionSetLicenseAssign 
+WHERE PermissionSetLicense.DeveloperName LIKE '%Analytics%'</code></pre>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-800">Apex Script: Safe Automated Assignment (PSL First, then PS)</label>
+                  <button class="copy-btn text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1" data-target="apex-code">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    Copy Apex
+                  </button>
+                </div>
+                <pre class="bg-slate-900 text-slate-100 p-3.5 rounded-xl text-xs overflow-x-auto border border-slate-800"><code id="apex-code">// Script will generate based on active analysis</code></pre>
+              </div>
+            </div>
+
+            <!-- Tab 4: Architect Gotchas -->
+            <div id="tab-content-gotchas" class="p-6 hidden space-y-4">
+              <div class="border-l-4 border-amber-500 pl-4 py-1">
+                <h5 class="text-xs font-bold text-slate-900 uppercase">1. Security Predicates Bypass with "Manage CRM Analytics"</h5>
+                <p class="text-xs text-slate-600 mt-1">
+                  If a user has <code>Manage CRM Analytics</code> or Salesforce's global <code>View All Data</code>, dataset row-level security predicates are completely bypassed. Never assign Manage CRM Analytics to dashboard designers or business managers who should only see their own department's data.
+                </p>
+              </div>
+
+              <div class="border-l-4 border-blue-500 pl-4 py-1">
+                <h5 class="text-xs font-bold text-slate-900 uppercase">2. Cross-App Dataset Dependency</h5>
+                <p class="text-xs text-slate-600 mt-1">
+                  A user can have Editor access to "Dashboard App A", but if the dashboard queries a dataset residing in "Core Data App B", the user <strong>must have at least Viewer access to App B</strong>. Otherwise, widgets querying that dataset will fail with access errors.
+                </p>
+              </div>
+
+              <div class="border-l-4 border-purple-500 pl-4 py-1">
+                <h5 class="text-xs font-bold text-slate-900 uppercase">3. CSV Export: Two Keys Needed</h5>
+                <p class="text-xs text-slate-600 mt-1">
+                  For a user to download CSV data, two criteria must be satisfied: (a) User must possess the <code>Download CRM Analytics Data</code> system permission, and (b) The specific dashboard widget must not have its action menu disabled in dashboard properties.
+                </p>
+              </div>
+
+              <div class="border-l-4 border-emerald-500 pl-4 py-1">
+                <h5 class="text-xs font-bold text-slate-900 uppercase">4. Growth vs. Plus Pricing Discrepancy</h5>
+                <p class="text-xs text-slate-600 mt-1">
+                  CRM Analytics Plus costs significantly more than Growth. Only assign Plus to users requiring Einstein Discovery automated story creation, model deployment, or live predictions in core workflows. Standard dashboards and recipes run identically under Growth.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+      <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      <span id="toast-text">Copied to clipboard</span>
+    </div>
+
+  </main>
+
+  <!-- Application Logic -->
+  <script>
+    // System Permissions Database
+    const SYSTEM_PERMISSIONS = [
+      {
+        id: 'view_dashboards',
+        label: 'View / Consume Dashboards',
+        apiName: 'Use CRM Analytics',
+        category: 'Basic',
+        desc: 'Allows opening Analytics Studio, running dashboards, viewing shared lenses, and filtering facets.',
+        defaultChecked: false
+      },
+      {
+        id: 'download_data',
+        label: 'Download / Export CSV Data',
+        apiName: 'Download CRM Analytics Data',
+        category: 'Export',
+        desc: 'Enables downloading tabular dataset rows and widget data directly into CSV or Excel format.',
+        defaultChecked: false
+      },
+      {
+        id: 'edit_dashboards',
+        label: 'Edit & Design Dashboards',
+        apiName: 'Create and Edit CRM Analytics Dashboards',
+        category: 'Design',
+        desc: 'Enables dashboard builder, lens saving, widget drag-and-drop, and SAQL query modification.',
+        defaultChecked: false
+      },
+      {
+        id: 'create_apps',
+        label: 'Create Personal Apps & Folders',
+        apiName: 'Create CRM Analytics Apps',
+        category: 'Workspace',
+        desc: 'Allows the user to create new app folders and manage their personal workspace.',
+        defaultChecked: false
+      },
+      {
+        id: 'edit_dataflows',
+        label: 'Build Recipes & Sync Dataflows',
+        apiName: 'Edit CRM Analytics Dataflows',
+        category: 'Data Management',
+        desc: 'Create, schedule, run, and modify Data Prep Recipes, sync connections, and dataflows.',
+        defaultChecked: false
+      },
+      {
+        id: 'einstein_discovery',
+        label: 'Author Einstein Discovery Models',
+        apiName: 'Create Einstein Discovery Stories',
+        category: 'AI / Discovery',
+        desc: 'Build automated machine learning models, evaluate variable importances, and deploy predictive models.',
+        defaultChecked: false
+      },
+      {
+        id: 'manage_analytics',
+        label: 'Manage CRM Analytics (Admin Override)',
+        apiName: 'Manage CRM Analytics',
+        category: 'Admin',
+        desc: 'Full administrator override: edit all apps, manage licenses, bypass row security predicates.',
+        defaultChecked: false
+      }
+    ];
+
+    // Pre-configured Personas
+    const PERSONA_PRESETS = [
+      {
+        name: 'View-Only Consumer',
+        tagline: 'A person can only view dashboard but cannot edit any',
+        keywords: ['only view', 'view dashboard', 'cannot edit', 'cant edit', 'can not edit', 'read only', 'consumer', 'viewer', 'view only'],
+        capabilities: ['view_dashboards']
+      },
+      {
+        name: 'Viewer with CSV Export',
+        tagline: 'Auditor or analyst needing dashboard viewing and CSV data downloads',
+        keywords: ['export', 'csv', 'download', 'excel', 'finance view', 'export csv', 'download data'],
+        capabilities: ['view_dashboards', 'download_data']
+      },
+      {
+        name: 'Dashboard Designer',
+        tagline: 'BI designer building dashboards, layouts, and managing apps',
+        keywords: ['designer', 'edit dashboard', 'build dashboard', 'author', 'widgets', 'saql', 'creator', 'design dashboard', 'modify layout'],
+        capabilities: ['view_dashboards', 'edit_dashboards', 'create_apps', 'download_data']
+      },
+      {
+        name: 'Recipe / Data Engineer',
+        tagline: 'Engineer building recipes, scheduling data sync, and running ETL',
+        keywords: ['recipe', 'dataflow', 'engineer', 'sync', 'connections', 'etl', 'prep', 'build recipe'],
+        capabilities: ['view_dashboards', 'edit_dataflows', 'download_data']
+      },
+      {
+        name: 'Einstein Discovery Modeler',
+        tagline: 'Data scientist building predictive ML stories and deploying AI models',
+        keywords: ['discovery', 'einstein', 'machine learning', 'story', 'prediction', 'model', 'stories', 'ml'],
+        capabilities: ['view_dashboards', 'edit_dashboards', 'create_apps', 'einstein_discovery', 'download_data']
+      },
+      {
+        name: 'Full CRMA Administrator',
+        tagline: 'System administrator requiring total control and security overrides',
+        keywords: ['admin', 'administrator', 'manage all', 'full control', 'superuser', 'manage analytics'],
+        capabilities: ['view_dashboards', 'download_data', 'edit_dashboards', 'create_apps', 'edit_dataflows', 'einstein_discovery', 'manage_analytics']
+      }
+    ];
+
+    // Default initial state: COMPLETELY BLANK
+    let state = {
+      capabilities: new Set(), // 0 checked on initial load
+      activeTab: 'guide',
+      activePersonaName: null
+    };
+
+    function init() {
+      renderPresetButtons();
+      renderCapabilitiesCheckboxes();
+      setupEventListeners();
+      updateView();
+    }
+
+    function renderPresetButtons() {
+      const container = document.getElementById('preset-buttons-container');
+      container.innerHTML = '';
+      PERSONA_PRESETS.forEach(persona => {
+        const btn = document.createElement('button');
+        const isActive = state.activePersonaName === persona.name;
+        btn.className = `preset-btn px-2.5 py-1.5 rounded-lg border text-xs font-medium transition text-left flex items-center gap-1.5 ${
+          isActive 
+            ? 'bg-blue-600 text-white border-blue-600 shadow-xs' 
+            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+        }`;
+        btn.innerHTML = `<span>${persona.name}</span>`;
+        btn.onclick = () => applyPersonaPreset(persona.name);
+        container.appendChild(btn);
+      });
+    }
+
+    function renderCapabilitiesCheckboxes() {
+      const container = document.getElementById('capabilities-list');
+      container.innerHTML = '';
+
+      SYSTEM_PERMISSIONS.forEach(perm => {
+        const isChecked = state.capabilities.has(perm.id);
+        const card = document.createElement('label');
+        card.className = `flex items-start gap-3 p-3 rounded-xl border transition cursor-pointer select-none ${
+          isChecked ? 'bg-blue-50/70 border-blue-200' : 'bg-white border-slate-200 hover:bg-slate-50'
+        }`;
+
+        card.innerHTML = `
+          <input 
+            type="checkbox" 
+            value="${perm.id}" 
+            ${isChecked ? 'checked' : ''} 
+            class="mt-1 w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+          />
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-900">${perm.label}</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">${perm.apiName}</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">${perm.desc}</p>
+          </div>
+        `;
+
+        const checkbox = card.querySelector('input');
+        checkbox.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            state.capabilities.add(perm.id);
+          } else {
+            state.capabilities.delete(perm.id);
+          }
+          state.activePersonaName = state.capabilities.size > 0 ? 'Custom Fine-Tuned' : null;
+          updateView();
+          renderPresetButtons();
+        });
+
+        container.appendChild(card);
+      });
+
+      const count = state.capabilities.size;
+      const countEl = document.getElementById('active-caps-count');
+      countEl.textContent = `${count} selected`;
+      if (count > 0) {
+        countEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-semibold bg-blue-50 text-blue-700 border border-blue-200';
+      } else {
+        countEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-600 border border-slate-200';
+      }
+    }
+
+    function analyzeScenario(userQuery) {
+      const q = (userQuery || document.getElementById('scenario-input').value || '').toLowerCase().trim();
+      
+      if (!q) {
+        showToast('Please type a requirement to analyze');
+        return;
+      }
+
+      const detectedCaps = new Set();
+      let detectedPersonaName = 'Custom Analysis';
+
+      // 1. Strict Negative Check: "can only view", "cannot edit", "cant edit", "read only"
+      const isRestrictedToView = q.includes('only view') || 
+                                 q.includes('cannot edit') || 
+                                 q.includes('cant edit') || 
+                                 q.includes('can not edit') || 
+                                 q.includes('read only') ||
+                                 q.includes('just view');
+
+      // 2. Base View Check
+      if (q.includes('view') || q.includes('dashboard') || q.includes('lens') || q.includes('report') || isRestrictedToView) {
+        detectedCaps.add('view_dashboards');
+      }
+
+      // 3. Export / CSV Check
+      if (q.includes('download') || q.includes('csv') || q.includes('export') || q.includes('excel')) {
+        detectedCaps.add('download_data');
+      }
+
+      // 4. Edit Dashboards (Ensure not negated by "cannot edit")
+      if (!isRestrictedToView && (q.includes('edit dashboard') || q.includes('design') || q.includes('build dashboard') || q.includes('author') || q.includes('widgets') || q.includes('saql'))) {
+        detectedCaps.add('view_dashboards');
+        detectedCaps.add('edit_dashboards');
+        detectedCaps.add('create_apps');
+      }
+
+      // 5. Dataflows & Recipes
+      if (q.includes('recipe') || q.includes('dataflow') || q.includes('prep') || q.includes('sync') || q.includes('etl') || q.includes('pipeline')) {
+        detectedCaps.add('view_dashboards');
+        detectedCaps.add('edit_dataflows');
+      }
+
+      // 6. Einstein Discovery / AI
+      if (q.includes('discovery') || q.includes('einstein') || q.includes('machine learning') || q.includes('ml') || q.includes('story') || q.includes('stories') || q.includes('predict') || q.includes('prediction')) {
+        detectedCaps.add('view_dashboards');
+        detectedCaps.add('einstein_discovery');
+        if (!isRestrictedToView) {
+          detectedCaps.add('edit_dashboards');
+        }
+      }
+
+      // 7. Admin / Superuser
+      if (q.includes('admin') || q.includes('manage analytics') || q.includes('full control') || q.includes('superuser') || q.includes('administrator')) {
+        detectedCaps.add('view_dashboards');
+        detectedCaps.add('download_data');
+        detectedCaps.add('edit_dashboards');
+        detectedCaps.add('create_apps');
+        detectedCaps.add('edit_dataflows');
+        detectedCaps.add('einstein_discovery');
+        detectedCaps.add('manage_analytics');
+        detectedPersonaName = 'Full CRMA Administrator';
+      }
+
+      // Set fallback if only negative view was entered
+      if (isRestrictedToView && !detectedCaps.has('download_data')) {
+        detectedCaps.clear();
+        detectedCaps.add('view_dashboards');
+        detectedPersonaName = 'View-Only Consumer';
+      }
+
+      // Check against existing persona matches
+      PERSONA_PRESETS.forEach(p => {
+        let match = false;
+        p.keywords.forEach(kw => {
+          if (q.includes(kw)) match = true;
+        });
+        if (match && detectedPersonaName === 'Custom Analysis') {
+          detectedPersonaName = p.name;
+        }
+      });
+
+      if (detectedCaps.size === 0) {
+        // Fallback default to view dashboard if nothing matched
+        detectedCaps.add('view_dashboards');
+        detectedPersonaName = 'View-Only Match';
+      }
+
+      state.capabilities = detectedCaps;
+      state.activePersonaName = detectedPersonaName;
+
+      updateView();
+      renderCapabilitiesCheckboxes();
+      renderPresetButtons();
+      showToast(`Analyzed: "${detectedPersonaName}" matched`);
+    }
+
+    function applyPersonaPreset(personaName) {
+      const persona = PERSONA_PRESETS.find(p => p.name === personaName);
+      if (!persona) return;
+
+      state.capabilities = new Set(persona.capabilities);
+      state.activePersonaName = persona.name;
+      
+      const input = document.getElementById('scenario-input');
+      input.value = persona.tagline;
+      document.getElementById('clear-input-btn').classList.remove('hidden');
+
+      updateView();
+      renderCapabilitiesCheckboxes();
+      renderPresetButtons();
+    }
+
+    function resetToBlank() {
+      state.capabilities.clear();
+      state.activePersonaName = null;
+      document.getElementById('scenario-input').value = '';
+      document.getElementById('clear-input-btn').classList.add('hidden');
+      updateView();
+      renderCapabilitiesCheckboxes();
+      renderPresetButtons();
+      showToast('Reset to blank canvas');
+    }
+
+    function updateView() {
+      const count = state.capabilities.size;
+      const emptyPanel = document.getElementById('empty-state-panel');
+      const resultsPanel = document.getElementById('results-panel');
+      const matchBadge = document.getElementById('smart-matched-badge');
+
+      if (count === 0) {
+        emptyPanel.classList.remove('hidden');
+        resultsPanel.classList.add('hidden');
+        matchBadge.classList.add('hidden');
+        document.getElementById('rule-callout-text').innerHTML = 
+          '<strong>Order of Operations:</strong> A Permission Set License (PSL) must be assigned to the User record <em>before</em> any dependent Permission Set can be assigned.';
+        return;
+      }
+
+      emptyPanel.classList.add('hidden');
+      resultsPanel.classList.remove('hidden');
+      matchBadge.classList.remove('hidden');
+      document.getElementById('matched-persona-name').textContent = state.activePersonaName || 'Calculated Role';
+
+      evaluateRequirements();
+    }
+
+    function evaluateRequirements() {
+      const caps = state.capabilities;
+      const requiresDiscovery = caps.has('einstein_discovery');
+      const requiresAdmin = caps.has('manage_analytics');
+      const requiresDesign = caps.has('edit_dashboards');
+      const requiresDataflows = caps.has('edit_dataflows');
+      const requiresAppCreate = caps.has('create_apps');
+      const requiresDownload = caps.has('download_data');
+
+      // 1. PSL Determination
+      let pslName = 'CRM Analytics Growth';
+      let pslBadge = 'Standard License';
+      let pslBadgeColor = 'bg-emerald-100 text-emerald-800';
+      let pslTypeLabel = 'Growth or Plus';
+
+      if (requiresDiscovery || requiresAdmin) {
+        pslName = 'CRM Analytics Plus';
+        pslBadge = 'Premium / AI License';
+        pslBadgeColor = 'bg-purple-100 text-purple-800';
+        pslTypeLabel = 'Requires Plus';
+      }
+
+      // 2. Permission Set Determination
+      let psName = 'CRMA Custom Role';
+      let psTypeBadge = 'Custom Built';
+
+      if (requiresAdmin) {
+        psName = 'CRM Analytics Plus Admin';
+        psTypeBadge = 'Standard SF PS';
+      } else if (!requiresDesign && !requiresDataflows && !requiresDiscovery && !requiresAppCreate) {
+        psName = requiresDownload ? 'CRMA View with Data Download' : 'CRMA View-Only User';
+        psTypeBadge = 'Custom PS';
+      } else if (requiresDesign && !requiresDataflows && !requiresDiscovery) {
+        psName = 'CRMA Dashboard Designer';
+        psTypeBadge = 'Custom PS';
+      } else if (requiresDataflows && !requiresDesign && !requiresDiscovery) {
+        psName = 'CRMA Data Preparation Engineer';
+        psTypeBadge = 'Custom PS';
+      } else if (requiresDiscovery) {
+        psName = 'CRM Analytics Plus Discovery Modeler';
+        psTypeBadge = 'Custom PS';
+      }
+
+      // 3. App Sharing Role
+      let appRole = 'Viewer';
+      let appRoleDesc = 'Read-Only (Exploration & Faceting)';
+      let appRoleColor = 'text-sky-700';
+
+      if (requiresAdmin) {
+        appRole = 'Manager (Overridden)';
+        appRoleDesc = 'Full Administrative Control';
+        appRoleColor = 'text-purple-700';
+      } else if (requiresDesign || requiresDataflows) {
+        appRole = 'Editor';
+        appRoleDesc = 'Save & Modify Assets';
+        appRoleColor = 'text-amber-700';
+      }
+
+      // Update Top Summary Cards
+      document.getElementById('card-psl-name').textContent = pslName;
+      document.getElementById('card-psl-badge').textContent = pslBadge;
+      document.getElementById('card-psl-badge').className = `px-1.5 py-0.5 font-semibold rounded text-[10px] ${pslBadgeColor}`;
+      document.getElementById('card-psl-type').textContent = pslTypeLabel;
+
+      document.getElementById('card-ps-name').textContent = psName;
+      document.getElementById('card-ps-type-badge').textContent = psTypeBadge;
+
+      document.getElementById('card-app-role').textContent = appRole;
+      document.getElementById('card-app-role').className = `text-base font-extrabold mt-1 leading-snug ${appRoleColor}`;
+      document.getElementById('card-app-role-desc').textContent = appRoleDesc;
+
+      // Update Narrative Box
+      let narrativeHtml = `
+        <strong>Recommended Architecture for "${state.activePersonaName || 'Current Configuration'}":</strong><br>
+        1. <strong>License:</strong> Assign <code>${pslName}</code> Permission Set License (${requiresDiscovery ? 'Required for Einstein Discovery ML modeling' : 'Standard Growth license is fully sufficient and cost-effective'}).<br>
+        2. <strong>Permission Set:</strong> Assign or create <code>${psName}</code> with only required system permissions.<br>
+        3. <strong>Folder Sharing:</strong> In Analytics Studio, add user or public group with <strong>${appRole}</strong> access.
+      `;
+      document.getElementById('narrative-text').innerHTML = narrativeHtml;
+
+      // Update Step Guide, Tables, Snippets, and Callouts
+      renderStepGuide(pslName, psName, appRole, caps);
+      renderPermissionsTable(caps);
+      renderCodeSnippets(pslName, psName);
+
+      const ruleCallout = document.getElementById('rule-callout-text');
+      if (caps.has('manage_analytics')) {
+        ruleCallout.innerHTML = '<span class="text-rose-700 font-bold">WARNING:</span> "Manage CRM Analytics" is enabled. This user will <strong>bypass all dataset security predicates</strong> and have full access to all private apps!';
+      } else if (caps.has('edit_dashboards') && appRole === 'Viewer') {
+        ruleCallout.innerHTML = '<strong>App Sharing Precedence:</strong> Even with dashboard design permissions, the user will be forced into read-only mode if their app folder access is set to Viewer.';
+      } else {
+        ruleCallout.innerHTML = '<strong>Order of Operations:</strong> A Permission Set License (PSL) must be assigned to the User record <em>before</em> any dependent Permission Set can be assigned.';
+      }
+    }
+
+    function renderStepGuide(pslName, psName, appRole, caps) {
+      const container = document.getElementById('steps-timeline');
+      container.innerHTML = '';
+
+      const steps = [
+        {
+          num: '1',
+          title: `Step 1: Assign the "${pslName}" Permission Set License (PSL)`,
+          time: '2 mins',
+          tag: 'License Allocation',
+          path: 'Setup > Users > Users > [Select User] > Permission Set License Assignments > Edit Assignments',
+          details: `Locate <strong>${pslName}</strong> (or check <code>SalesforceAnalytics</code>). Check the box and save. <span class="text-rose-600 font-semibold">Do not skip this step</span>; Salesforce blocks permission sets if the PSL is not already active.`
+        },
+        {
+          num: '2',
+          title: `Step 2: Create & Configure Permission Set "${psName}"`,
+          time: '3 mins',
+          tag: 'Security Setup',
+          path: 'Setup > Users > Permission Sets > New',
+          details: `
+            <ol class="list-decimal pl-4 space-y-1 mt-1 text-slate-600">
+              <li>Enter Label: <code>${psName}</code></li>
+              <li>Under <strong>License</strong> dropdown, explicitly select <code>${pslName}</code>.</li>
+              <li>Save, then open <strong>System Permissions</strong> and click <strong>Edit</strong>.</li>
+              <li>Enable the checked permissions: ${Array.from(caps).map(c => {
+                const item = SYSTEM_PERMISSIONS.find(p => p.id === c);
+                return item ? `<strong>${item.apiName}</strong>` : '';
+              }).filter(Boolean).join(', ')}.</li>
+              <li>Save and click <strong>Manage Assignments</strong> to assign to your target users or groups.</li>
+            </ol>
+          `
+        },
+        {
+          num: '3',
+          title: `Step 3: Configure Folder & App Sharing in Analytics Studio`,
+          time: '2 mins',
+          tag: 'App Workspace Access',
+          path: 'App Launcher > Analytics Studio > All Apps > [Target App Folder] > Share Button',
+          details: `
+            System permissions only grant the capability to execute actions; the app share determines where they can do it.
+            <div class="mt-2 bg-slate-100 p-2.5 rounded-lg">
+              <span class="font-bold text-slate-900">Recommended Sharing Role: ${appRole}</span>
+              <p class="text-xs text-slate-600 mt-0.5">
+                ${appRole.includes('Viewer') 
+                  ? 'Viewer allows exploring lenses, running dashboards, and filtering widgets without allowing overwrite of production assets.' 
+                  : 'Editor allows authoring widgets and saving changes. Manager additionally allows deleting the app and changing sharing settings.'}
+              </p>
+            </div>
+          `
+        },
+        {
+          num: '4',
+          title: `Step 4: Verify Cross-App Dataset Dependencies`,
+          time: '1 min',
+          tag: 'Data Architecture',
+          path: 'Analytics Studio > Datasets > View details of source datasets',
+          details: `If the dashboard uses datasets created in a separate core workspace (e.g., "Operations Central"), verify that this user has at least <strong>Viewer</strong> access to that source app folder as well. Otherwise, queries will return blank charts.`
+        }
+      ];
+
+      steps.forEach(step => {
+        const item = document.createElement('div');
+        item.className = 'flex gap-3 text-xs bg-slate-50/70 p-3.5 rounded-xl border border-slate-200';
+        item.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+            ${step.num}
+          </div>
+          <div class="flex-1 space-y-1">
+            <div class="flex flex-wrap items-center justify-between gap-1">
+              <h5 class="font-bold text-slate-900 text-sm">${step.title}</h5>
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-semibold">${step.tag}</span>
+                <span class="text-slate-400 text-[11px]">${step.time}</span>
+              </div>
+            </div>
+            <div class="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 font-mono text-[11px] text-blue-700 flex items-center justify-between">
+              <span>${step.path}</span>
+              <button class="copy-text-btn text-slate-400 hover:text-slate-700 ml-2" data-copy="${step.path}" title="Copy Path">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </button>
+            </div>
+            <div class="text-slate-600 pt-1 leading-relaxed">${step.details}</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      container.querySelectorAll('.copy-text-btn').forEach(btn => {
+        btn.onclick = () => {
+          copyToClipboard(btn.getAttribute('data-copy'), 'Setup path copied');
+        };
+      });
+    }
+
+    function renderPermissionsTable(caps) {
+      const tbody = document.getElementById('permissions-table-body');
+      tbody.innerHTML = '';
+
+      SYSTEM_PERMISSIONS.forEach(perm => {
+        const isEnabled = caps.has(perm.id);
+        const tr = document.createElement('tr');
+        tr.className = isEnabled ? 'bg-blue-50/40 font-medium' : 'text-slate-400';
+
+        tr.innerHTML = `
+          <td class="p-3">
+            <div class="font-bold text-slate-900">${perm.label}</div>
+            <div class="font-mono text-[10px] text-slate-500">${perm.apiName}</div>
+          </td>
+          <td class="p-3">
+            ${isEnabled 
+              ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">Enabled</span>' 
+              : '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500">Disabled</span>'}
+          </td>
+          <td class="p-3 text-slate-600 text-xs">
+            ${perm.desc}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderCodeSnippets(pslName, psName) {
+      const psSafeDevName = psName.replace(/[^a-zA-Z0-9]/g, '_');
+
+      const soql = `// 1. Audit users assigned the ${pslName} PSL
+SELECT AssigneeId, Assignee.Name, Assignee.Email, Assignee.Profile.Name,
+       PermissionSetLicense.MasterLabel, PermissionSetLicense.DeveloperName
+FROM PermissionSetLicenseAssign
+WHERE PermissionSetLicense.MasterLabel = '${pslName}'
+ORDER BY Assignee.Name ASC
+
+// 2. Audit who has this specific Permission Set assigned
+SELECT AssigneeId, Assignee.Name, PermissionSet.Label, PermissionSet.PermissionsUseAnalyticsPlatform
+FROM PermissionSetAssignment
+WHERE PermissionSet.Name = '${psSafeDevName}' OR PermissionSet.Label = '${psName}'`;
+
+      document.getElementById('soql-code').textContent = soql;
+
+      const apex = `// Safe automated assignment script for target user
+Id targetUserId = '005XXXXXXXXXXXX'; // Replace with target User Id
+
+// 1. Validate & Assign PSL first
+PermissionSetLicense psl = [
+    SELECT Id FROM PermissionSetLicense 
+    WHERE MasterLabel = '${pslName}' 
+    LIMIT 1
+];
+
+List<PermissionSetLicenseAssign> pslaList = [
+    SELECT Id FROM PermissionSetLicenseAssign 
+    WHERE AssigneeId = :targetUserId AND PermissionSetLicenseId = :psl.Id
+];
+
+if (pslaList.isEmpty()) {
+    insert new PermissionSetLicenseAssign(
+        AssigneeId = targetUserId,
+        PermissionSetLicenseId = psl.Id
+    );
+    System.debug('Assigned PSL: ${pslName}');
+}
+
+// 2. Assign Target Permission Set
+PermissionSet ps = [
+    SELECT Id FROM PermissionSet 
+    WHERE Name = '${psSafeDevName}' OR Label = '${psName}' 
+    LIMIT 1
+];
+
+List<PermissionSetAssignment> psaList = [
+    SELECT Id FROM PermissionSetAssignment
+    WHERE AssigneeId = :targetUserId AND PermissionSetId = :ps.Id
+];
+
+if (psaList.isEmpty()) {
+    insert new PermissionSetAssignment(
+        AssigneeId = targetUserId,
+        PermissionSetId = ps.Id
+    );
+    System.debug('Assigned Permission Set: ' + ps.Id);
+}`;
+
+      document.getElementById('apex-code').textContent = apex;
+    }
+
+    function setupEventListeners() {
+      const input = document.getElementById('scenario-input');
+      const analyzeBtn = document.getElementById('analyze-btn');
+      const clearAllBtn = document.getElementById('clear-all-btn');
+      const headerResetBtn = document.getElementById('header-reset-btn');
+      const clearInputBtn = document.getElementById('clear-input-btn');
+
+      // Click Analyze Button
+      analyzeBtn.addEventListener('click', () => {
+        analyzeScenario(input.value);
+      });
+
+      // Enter key triggers analysis
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          analyzeScenario(input.value);
+        }
+      });
+
+      // Show/hide small clear button inside input
+      input.addEventListener('input', () => {
+        if (input.value.trim().length > 0) {
+          clearInputBtn.classList.remove('hidden');
+        } else {
+          clearInputBtn.classList.add('hidden');
+        }
+      });
+
+      clearInputBtn.addEventListener('click', () => {
+        input.value = '';
+        clearInputBtn.classList.add('hidden');
+        input.focus();
+      });
+
+      // Clear / Reset Everything
+      clearAllBtn.addEventListener('click', resetToBlank);
+      headerResetBtn.addEventListener('click', resetToBlank);
+
+      // Tab switching
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabId = btn.getAttribute('data-tab');
+          switchTab(tabId);
+        });
+      });
+
+      // Copy buttons
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-target');
+          const text = document.getElementById(targetId).textContent;
+          copyToClipboard(text, 'Code snippet copied');
+        });
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = 'tab-btn px-4 py-2.5 border-b-2 border-blue-600 text-blue-600 font-semibold transition flex items-center gap-1.5';
+        } else {
+          btn.className = 'tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition flex items-center gap-1.5';
+        }
+      });
+
+      document.getElementById('tab-content-guide').classList.toggle('hidden', tabId !== 'guide');
+      document.getElementById('tab-content-matrix').classList.toggle('hidden', tabId !== 'matrix');
+      document.getElementById('tab-content-code').classList.toggle('hidden', tabId !== 'code');
+      document.getElementById('tab-content-gotchas').classList.toggle('hidden', tabId !== 'gotchas');
+    }
+
+    function copyToClipboard(text, message) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(message || 'Copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy', err);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2400);
+    }
+
+    // Start with blank slate on load
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
